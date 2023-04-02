@@ -67,13 +67,24 @@ export class AuthService {
 
     }
 
-    logout(){
+    async logout(userId:string){
+        await this.UserModel.findByIdAndUpdate(userId,{
+            hashref:null
+        })
+        return{
+            deleted:true
+        }
+    }
+
+    async refreshtoken(userId:number,rt:string){
+        const user=await this.UserModel.findById(userId)
+        if(!user) throw new ForbiddenException("Access denied")
+        const token=await this.getToken(user.id,user.email)
+        await this.updateHash(user.id,token.refresh_token)
+        return token
 
     }
 
-    refreshtoken(){
-
-    }
 
 
 }
